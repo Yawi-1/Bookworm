@@ -16,9 +16,15 @@ const userSchema = new mongoose.Schema({
     profilePic: {
         type: String,
         default: 'https://cdn-icons-png.flaticon.com/512/149/149071.png'
-    }
+    },
+    verifiedEmail: {
+        type: Boolean,
+        default: false
+    },
+    otp: Number,
+    otpExpires: Date
 }, {
     timestamps: true
 });
 
-module.exports = mongoose.model('User',userSchema);
+module.exports = mongoose.model('User', userSchema);
