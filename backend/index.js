@@ -4,6 +4,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 const db = require('./config/db')
 const authRoutes = require('./routes/auth.routes')
+const booksRoutes = require('./routes/book.routes')
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan('dev'))
 app.use('/api/auth',authRoutes)
+app.use('/api/books',booksRoutes)
 
 
 
