@@ -2,7 +2,6 @@ const Book = require('../models/Book');
 const uploadToCloudinary = require('../utils/cloudinary');
 
 const createBook = async (req, res) => {
-    console.log('hello')
     const { title, caption, rating } = req.body;
     const image = req.file;
     const createdBy = req.auth.id;
