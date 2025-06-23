@@ -8,7 +8,6 @@ const booksRoutes = require('./routes/book.routes')
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-console.log(process.env.PORT)
 
 
 app.use(express.json());

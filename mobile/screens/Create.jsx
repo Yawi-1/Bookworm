@@ -8,21 +8,22 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
+  ActivityIndicator
 } from 'react-native';
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import styles from '../assets/styles/add.styles' 
+import styles from '../assets/styles/add.styles';
 import COLORS from '../constants/color';
+import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { useBooks } from '../context/BookContext'
 
 const Create = () => {
   const [title, setTitle] = useState('');
-  const [rating, setRating] = useState(0);
   const [caption, setCaption] = useState('');
-  const [imageUri, setImageUri] = useState(null);
-
-  const handleRating = (index) => {
-    setRating(index);
-  };
+  const [rating, setRating] = useState(0);
+  const [image, setImage] = useState(null); // object from picker
+  const [preview, setPreview] = useState(null); // uri to show image
+  const { addBook, loading } = useBooks();
 
   const pickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -31,21 +32,31 @@ const Create = () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.7,
+      base64: false, 
     });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
+      const asset = result.assets[0];
+      setPreview(asset.uri);
+      setImage({
+        uri: asset.uri,
+        type: asset.type || 'image/jpeg',
+        name: asset.fileName || 'photo.jpg',
+      });
     }
   };
 
-  const handleSubmit = () => {
-    console.log({
-      title,
-      rating,
-      imageUri,
-      caption,
-    });
-    // Send data to backend or state management
+  const handleSubmit = async () => {
+    if (!title || !caption || !rating || !image) {
+      return Alert.alert('All fields are required');
+    }
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('caption', caption);
+    formData.append('rating', rating.toString());
+    formData.append('image', image);
+    console.log('hello')
+    await addBook(formData);
   };
 
   return (
@@ -55,40 +66,25 @@ const Create = () => {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.card}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Add Book Recommendation</Text>
-            <Text style={styles.subtitle}>
-              Share your favorite reads with others
-            </Text>
-          </View>
+          <Text style={styles.title}>Add Book Recommendation</Text>
 
-          {/* Book Title */}
           <View style={styles.formGroup}>
             <Text style={styles.label}>Book Title</Text>
-            <View style={styles.inputContainer}>
-              <MaterialIcons name="menu-book" size={20} style={styles.inputIcon} color={COLORS.textSecondary} />
-              <TextInput
-                placeholder="Enter book title"
-                placeholderTextColor={COLORS.textSecondary}
-                value={title}
-                onChangeText={setTitle}
-                style={styles.input}
-              />
-            </View>
+            <TextInput
+              placeholder="Enter book title"
+              style={styles.input}
+              value={title}
+              onChangeText={setTitle}
+            />
           </View>
 
-          {/* Rating */}
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Your Rating</Text>
+            <Text style={styles.label}>Rating</Text>
             <View style={styles.ratingContainer}>
-              {[1, 2, 3, 4, 5].map((index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.starButton}
-                  onPress={() => handleRating(index)}
-                >
+              {[1, 2, 3, 4, 5].map((num) => (
+                <TouchableOpacity key={num} onPress={() => setRating(num)}>
                   <FontAwesome
-                    name={index <= rating ? 'star' : 'star-o'}
+                    name={rating >= num ? 'star' : 'star-o'}
                     size={24}
                     color="#f1c40f"
                   />
@@ -97,12 +93,11 @@ const Create = () => {
             </View>
           </View>
 
-          {/* Image Picker */}
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Book Image</Text>
+            <Text style={styles.label}>Select Image</Text>
             <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
-              {imageUri ? (
-                <Image source={{ uri: imageUri }} style={styles.previewImage} />
+              {preview ? (
+                <Image source={{ uri: preview }} style={styles.previewImage} />
               ) : (
                 <View style={styles.placeholderContainer}>
                   <MaterialIcons name="image" size={40} color={COLORS.textSecondary} />
@@ -112,23 +107,29 @@ const Create = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Caption */}
           <View style={styles.formGroup}>
             <Text style={styles.label}>Caption</Text>
             <TextInput
-              placeholder="Write your review or thoughts about this book..."
-              placeholderTextColor={COLORS.textSecondary}
+              multiline
+              placeholder="Write your thoughts..."
+              style={styles.textArea}
               value={caption}
               onChangeText={setCaption}
-              multiline
-              style={styles.textArea}
             />
           </View>
 
-          {/* Submit Button */}
           <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-            <MaterialIcons name="send" size={20} color={COLORS.white} style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Submit</Text>
+            {
+              loading ? (
+                <ActivityIndicator size="small" color='#fff' />
+              ) : (
+                <>
+                  <MaterialIcons name="send" size={20} color={COLORS.white} style={styles.buttonIcon} />
+                  <Text style={styles.buttonText}>Submit</Text>
+                </>
+              )
+            }
+
           </TouchableOpacity>
         </View>
       </ScrollView>
