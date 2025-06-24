@@ -6,12 +6,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Upload using Base64 data URI (no external libs)
-const uploadToCloudinary = async (file) => {
-  const base64DataURI = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
-
-  const result = await cloudinary.uploader.upload(base64DataURI);
-
+// Accept base64 string directly
+const uploadToCloudinary = async (base64Data) => {
+  const result = await cloudinary.uploader.upload(base64Data);
   return result.secure_url;
 };
 

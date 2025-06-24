@@ -18,11 +18,11 @@ import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { useBooks } from '../context/BookContext';
 import { useAuth } from '../context/AuthContent';
 
-const Create = () => {
+const Create = ({navigation}) => {
   const [title, setTitle] = useState('');
   const [caption, setCaption] = useState('');
   const [rating, setRating] = useState(0);
-  const [image, setImage] = useState(null);
+  const [imageBase64, setImageBase64] = useState(null);
   const [preview, setPreview] = useState(null);
   const { addBook, loading } = useBooks();
   const { state } = useAuth();
@@ -38,42 +38,43 @@ const Create = () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.7,
-      base64: false,
+      base64: true,
     });
 
     if (!result.canceled) {
       const asset = result.assets[0];
       setPreview(asset.uri);
-      setImage({
-        uri: asset.uri,
-        type: asset.type || 'image/jpeg',
-        name: asset.fileName || `photo_${Date.now()}.jpg`,
-      });
+      setImageBase64(`data:image/jpeg;base64,${asset.base64}`);
     }
   };
 
   const handleSubmit = async () => {
-    if (!title || !caption || !rating || !image) {
+    if (!title || !caption || !rating || !imageBase64) {
       return Alert.alert('All fields are required');
     }
 
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('caption', caption);
-    formData.append('rating', rating);
-    formData.append('image', {
-      uri: image.uri,
-      type: image.type || 'image/jpeg', // Fallback type
-      name: image.name || `book_${Date.now()}.jpg`, // Fallback name
-    });
+    const bookData = {
+      title,
+      caption,
+      rating,
+      imageBase64,
+    };
 
-    await addBook(formData);
+    await addBook(bookData);
+    navigation.navigate('Home');
+    setTitle('');
+    setCaption('');
+    setRating(0);
+    setImageBase64(null);
+    setPreview(null);
+
+
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.scrollViewStyle}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.card}>

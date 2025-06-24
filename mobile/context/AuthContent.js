@@ -14,9 +14,9 @@ export const AuthProvider = ({ children }) => {
     // Default axios settings
     axios.defaults.baseURL = 'http://192.168.168.13:8000/api';
     const token = state?.token;
-    // if (token) {
-    //     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    // }
+    if (token) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
 
 
     // Sign Up Function

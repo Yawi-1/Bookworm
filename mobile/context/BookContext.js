@@ -5,6 +5,7 @@ const BookContext = createContext();
 
 export const BookProvider = ({ children }) => {
     const [books, setBooks] = useState([]);
+    const [myBooks, setMyBooks] = useState([]);
     const [loading, setLoading] = useState(false);
     const { state } = useAuth();
     const token = state?.token;
@@ -18,11 +19,7 @@ export const BookProvider = ({ children }) => {
             return;
         }
         try {
-            const { data } = await axios.post('/books', book, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                }
-            });
+            const { data } = await axios.post('/books', book);
             setBooks([...books, data.book]);
             alert('Book added successfully!');
         } catch (error) {
@@ -50,8 +47,22 @@ export const BookProvider = ({ children }) => {
             setLoading(false);
         }
     }
+
+    const fetchMyBooks = async () => {
+        setLoading(true);
+        try {
+            const { data } = await axios.get(`/books/getBooksByUser`);
+            setMyBooks(data.books);
+        } catch (error) {
+            console.log(error)
+            console.log(error?.response?.data?.message || 'Failed to fetch books by user.');
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+
     useEffect(() => {
-        // console.log('Fetching books')
         if (token) {
             getBooks();
         };
@@ -60,7 +71,7 @@ export const BookProvider = ({ children }) => {
 
 
     return (
-        <BookContext.Provider value={{ books, addBook, loading }}>
+        <BookContext.Provider value={{ books, addBook, loading, fetchMyBooks,myBooks }}>
             {children}
         </BookContext.Provider>
     )
