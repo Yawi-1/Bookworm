@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  Image,
-  FlatList,
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
@@ -14,18 +12,13 @@ import { useAuth } from '../context/AuthContent';
 import { useBooks } from '../context/BookContext';
 import ProfileCard from '../components/ProfileCard';
 import MyBooks from '../components/MyBooks';
-import LogoutModal from '../components/LogoutModal';
+import LogoutModal from '../components/ConfirmModal';
 
 const Profile = () => {
   const { handleLogout, state } = useAuth();
   const { user } = state;
-  const { myBooks, fetchMyBooks, loading } = useBooks();
+  const { myBooks, fetchMyBooks, loading,deleteBook } = useBooks();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-
-  const handleDelete = (id) => {
-    // const updatedBooks = books.filter((book) => book.id !== id);
-    // setBooks(updatedBooks);
-  };
   useEffect(() => {
     fetchMyBooks();
   }, []);
@@ -64,11 +57,15 @@ const Profile = () => {
           }
         </>
       ) : (
-        <MyBooks myBooks={myBooks} handleDelete={handleDelete} />
+        <MyBooks myBooks={myBooks} deleteBook={deleteBook} />
       )}
 
       {/* Logout Modal */}
-      <LogoutModal visible={showLogoutModal} onClose={()=>setShowLogoutModal(false)} onConfirm={handleLogout}/>
+      <LogoutModal visible={showLogoutModal} 
+      onClose={()=>setShowLogoutModal(false)} 
+      onConfirm={handleLogout}
+      text={'Are you sure you want to logout?'}
+      />
     </View>
   );
 };

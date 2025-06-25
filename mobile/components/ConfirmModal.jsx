@@ -1,17 +1,14 @@
-import React, { useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
 
-const LogoutModal = ({ visible, onClose, onConfirm }) => {
+const LogoutModal = ({ visible, onClose, onConfirm, text }) => {
   return (
     <Modal transparent visible={visible} animationType="fade">
       <View style={styles.modalBackground}>
         <View style={styles.modalContainer}>
-          <Text style={styles.modalText}>Are you sure you want to logout?</Text>
+          <Text style={styles.modalText}>{text}</Text>
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity onPress={
-                
-                
                 onConfirm} style={styles.confirmButton}>
               <Text style={styles.buttonText}>Yes</Text>
             </TouchableOpacity>

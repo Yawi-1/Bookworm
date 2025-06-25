@@ -29,8 +29,6 @@ export const BookProvider = ({ children }) => {
             setLoading(false);
         }
     }
-
-
     const getBooks = async () => {
         setLoading(true);
         try {
@@ -47,7 +45,6 @@ export const BookProvider = ({ children }) => {
             setLoading(false);
         }
     }
-
     const fetchMyBooks = async () => {
         setLoading(true);
         try {
@@ -61,6 +58,17 @@ export const BookProvider = ({ children }) => {
             setLoading(false);
         }
     }
+    const deleteBook = async(id)=>{
+        try {
+            const { data } = await axios.delete(`/books/${id}`);
+            setBooks(books.filter(book=>book._id!==id));
+            setMyBooks(myBooks.filter(book=>book._id!==id));
+            alert('Book deleted successfully!');
+        } catch (error) {
+            console.log(error)
+            console.log(error?.response?.data?.message || 'Failed to delete book.');
+        }
+    }
 
     useEffect(() => {
         if (token) {
@@ -71,7 +79,7 @@ export const BookProvider = ({ children }) => {
 
 
     return (
-        <BookContext.Provider value={{ books, addBook, loading, fetchMyBooks,myBooks }}>
+        <BookContext.Provider value={{ books, addBook, loading, fetchMyBooks,myBooks,deleteBook }}>
             {children}
         </BookContext.Provider>
     )
