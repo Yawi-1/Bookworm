@@ -42,4 +42,19 @@
 
 ---
 
-## 📂 Project Structure
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js and npm
+- MongoDB (local or Atlas)
+- Expo CLI (if using Expo)
+
+### Clone the repository
+
+```bash
+git clone https://github.com/Yawi-1/Bookworm.git
+cd bookworm
+
